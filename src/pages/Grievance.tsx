@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FileText, Upload, MapPin, CheckCircle } from "lucide-react";
+import { FileText, Upload, MapPin, CheckCircle, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,6 +42,7 @@ const Grievance = () => {
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [isCopied, setIsCopied] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -88,6 +89,26 @@ const Grievance = () => {
       });
     }
   };
+
+  const handleCopyComplaintId = async () => {
+    try {
+      await navigator.clipboard.writeText(complaintId);
+      setIsCopied(true);
+      toast({
+        title: "Copied!",
+        description: "Complaint ID copied to clipboard.",
+      });
+      // Reset copy icon after 2 seconds
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (error) {
+      toast({
+        title: "Copy Failed",
+        description: "Unable to copy. Please copy manually.",
+        variant: "destructive",
+      });
+    }
+  };
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -175,7 +196,20 @@ const Grievance = () => {
             </p>
             <div className="bg-primary/5 rounded-xl p-4 mb-6">
               <p className="text-sm text-muted-foreground mb-1">Your Complaint ID</p>
-              <p className="text-2xl font-bold text-primary">{complaintId}</p>
+              <div className="flex items-center justify-center gap-3">
+                <p className="text-2xl font-bold text-primary">{complaintId}</p>
+                <button
+                  onClick={handleCopyComplaintId}
+                  className="p-2 rounded-lg hover:bg-primary/10 transition-colors group"
+                  title="Copy Complaint ID"
+                >
+                  {isCopied ? (
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                  ) : (
+                    <Copy className="h-5 w-5 text-primary group-hover:text-primary/80" />
+                  )}
+                </button>
+              </div>
             </div>
             <p className="text-sm text-muted-foreground mb-6">
               Save this ID to track your complaint status. You will also receive updates via SMS/WhatsApp.
