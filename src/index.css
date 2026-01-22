@@ -1,0 +1,202 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+@layer base {
+  :root {
+    /* Navy Blue - Primary (Trust & Governance) */
+    --primary: 220 60% 25%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Saffron - Accent (Indian Identity) */
+    --accent: 30 90% 50%;
+    --accent-foreground: 0 0% 100%;
+    
+    /* Backgrounds */
+    --background: 210 20% 98%;
+    --foreground: 220 40% 13%;
+    
+    /* Cards & Surfaces */
+    --card: 0 0% 100%;
+    --card-foreground: 220 40% 13%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 40% 13%;
+    
+    /* Secondary - Light Navy */
+    --secondary: 220 30% 95%;
+    --secondary-foreground: 220 60% 25%;
+    
+    /* Muted */
+    --muted: 220 15% 92%;
+    --muted-foreground: 220 15% 45%;
+    
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Success */
+    --success: 142 70% 45%;
+    --success-foreground: 0 0% 100%;
+    
+    /* Warning */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    
+    /* Borders & Inputs */
+    --border: 220 20% 88%;
+    --input: 220 20% 88%;
+    --ring: 30 90% 50%;
+    
+    --radius: 0.75rem;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(220 60% 25%) 0%, hsl(220 50% 35%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(30 90% 50%) 0%, hsl(25 95% 55%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(220 60% 20%) 0%, hsl(220 55% 30%) 50%, hsl(30 70% 40%) 100%);
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(220 60% 25% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(220 60% 25% / 0.1), 0 2px 4px -2px hsl(220 60% 25% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(220 60% 25% / 0.1), 0 4px 6px -4px hsl(220 60% 25% / 0.1);
+    --shadow-xl: 0 20px 25px -5px hsl(220 60% 25% / 0.1), 0 8px 10px -6px hsl(220 60% 25% / 0.1);
+    --shadow-accent: 0 10px 30px -10px hsl(30 90% 50% / 0.4);
+    
+    /* Sidebar */
+    --sidebar-background: 220 60% 22%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 30 90% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 50% 30%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 220 50% 30%;
+    --sidebar-ring: 30 90% 50%;
+  }
+
+  .dark {
+    --background: 220 40% 8%;
+    --foreground: 210 20% 95%;
+    
+    --card: 220 35% 12%;
+    --card-foreground: 210 20% 95%;
+    
+    --popover: 220 35% 12%;
+    --popover-foreground: 210 20% 95%;
+    
+    --primary: 30 90% 55%;
+    --primary-foreground: 220 40% 10%;
+    
+    --secondary: 220 30% 18%;
+    --secondary-foreground: 210 20% 90%;
+    
+    --muted: 220 25% 18%;
+    --muted-foreground: 220 15% 60%;
+    
+    --accent: 30 90% 55%;
+    --accent-foreground: 220 40% 10%;
+    
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 220 25% 20%;
+    --input: 220 25% 20%;
+    --ring: 30 90% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-accent {
+    background: var(--gradient-accent);
+  }
+  
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+  
+  .shadow-card {
+    box-shadow: var(--shadow-md);
+  }
+  
+  .shadow-card-hover {
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .shadow-accent-glow {
+    box-shadow: var(--shadow-accent);
+  }
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background: var(--gradient-accent);
+  }
+  
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-md border border-border/50;
+  }
+  
+  .stat-card {
+    @apply bg-card rounded-xl p-6 shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1;
+  }
+  
+  .nav-link {
+    @apply text-foreground/80 hover:text-accent transition-colors duration-200 font-medium;
+  }
+  
+  .nav-link-active {
+    @apply text-accent font-semibold;
+  }
+}
+
+@layer utilities {
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+  
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
