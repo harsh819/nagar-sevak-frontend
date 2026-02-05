@@ -20,7 +20,7 @@ const HeroSection = () => {
               <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
               <span className="text-sm font-medium">Ward No. 45 • Mumbai</span>
             </div>
-            
+
             <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-4">
               जनसेवा प्रथम
             </h1>
@@ -28,7 +28,7 @@ const HeroSection = () => {
               डिजिटल सुविधा तुमच्या दारात
             </p>
             <p className="text-base lg:text-lg text-primary-foreground/80 mb-8 max-w-lg">
-              Transforming public service through digital innovation. Register complaints, 
+              Transforming public service through digital innovation. Register complaints,
               track progress, and stay connected with your Nagar Sevak's development initiatives.
             </p>
 
@@ -219,11 +219,10 @@ const RecentWorks = () => {
                   <HardHat className="h-6 w-6 text-primary" />
                 </div>
                 <span
-                  className={`text-xs font-medium px-3 py-1 rounded-full ${
-                    work.status === "Completed"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-accent/10 text-accent"
-                  }`}
+                  className={`text-xs font-medium px-3 py-1 rounded-full ${work.status === "Completed"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-accent/10 text-accent"
+                    }`}
                 >
                   {work.status}
                 </span>
@@ -240,9 +239,8 @@ const RecentWorks = () => {
                 </div>
                 <div className="h-2 bg-muted rounded-full overflow-hidden">
                   <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      work.progress === 100 ? "bg-green-500" : "bg-accent"
-                    }`}
+                    className={`h-full rounded-full transition-all duration-500 ${work.progress === 100 ? "bg-green-500" : "bg-accent"
+                      }`}
                     style={{ width: `${work.progress}%` }}
                   />
                 </div>
@@ -324,7 +322,7 @@ const CTASection = () => {
             Have a Concern? We're Here to Help!
           </h2>
           <p className="text-white/90 mb-8 max-w-2xl mx-auto">
-            आपली तक्रार नोंदवा आणि आमच्या कार्यालयाशी संपर्क साधा। Register your complaint today 
+            आपली तक्रार नोंदवा आणि आमच्या कार्यालयाशी संपर्क साधा। Register your complaint today
             and let us work together for a better community.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -346,8 +344,8 @@ const Index = () => {
     <>
       <HeroSection />
       <QuickActions />
-      <StatsSection />
-      <RecentWorks />
+      {/* <StatsSection /> */}
+      {/* <RecentWorks /> */}
       <Testimonials />
       <CTASection />
     </>

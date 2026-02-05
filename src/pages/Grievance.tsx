@@ -117,6 +117,9 @@ const Grievance = () => {
     try {
       const apiUrl = `${import.meta.env.VITE_BACKEND_URL}/api/complaints/register-complaint`;
 
+      console.log("=== FRONTEND SUBMISSION DEBUG ===");
+      console.log("Current location state:", location);
+
       // Create FormData for multipart/form-data
       const submitData = new FormData();
       submitData.append("fullName", formData.fullName);
@@ -129,6 +132,7 @@ const Grievance = () => {
       // Add image if uploaded
       if (imageFile) {
         submitData.append("image", imageFile);
+        console.log("✅ Image added to FormData");
       }
 
       // Add location if captured (in GeoJSON format)
@@ -137,7 +141,17 @@ const Grievance = () => {
           type: "Point",
           coordinates: [location.longitude, location.latitude], // [longitude, latitude] for GeoJSON
         };
+        console.log("📍 Location data to send:", locationData);
         submitData.append("location", JSON.stringify(locationData));
+        console.log("✅ Location added to FormData");
+      } else {
+        console.log("⚠️ No location to send");
+      }
+
+      // Log all FormData entries
+      console.log("FormData entries:");
+      for (let [key, value] of submitData.entries()) {
+        console.log(`  ${key}:`, value);
       }
 
       const response = await axios.post(apiUrl, submitData, {
@@ -145,6 +159,8 @@ const Grievance = () => {
           "Content-Type": "multipart/form-data",
         },
       });
+
+      console.log("Backend response:", response.data);
 
       // Extract complaint ID from response
       const generatedId = response.data.data?.complaintId || response.data.complaintId || `NS-${Date.now().toString().slice(-6)}`;

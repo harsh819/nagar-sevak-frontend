@@ -62,11 +62,10 @@ const Header = () => {
                 <Link
                   key={link.href}
                   to={link.href}
-                  className={`transition-colors duration-200 font-medium ${
-                    isActive(link.href)
+                  className={`transition-colors duration-200 font-medium ${isActive(link.href)
                       ? "text-accent"
                       : "text-foreground/80 hover:text-accent"
-                  }`}
+                    }`}
                 >
                   {link.label}
                 </Link>
@@ -75,9 +74,9 @@ const Header = () => {
 
             {/* CTA Buttons */}
             <div className="hidden lg:flex items-center gap-3">
-              <Button variant="outline" size="sm" asChild>
+              {/* <Button variant="outline" size="sm" asChild>
                 <Link to="/auth">Admin Login</Link>
-              </Button>
+              </Button> */}
               <Button variant="accent" asChild>
                 <Link to="/grievance">Register Complaint</Link>
               </Button>
@@ -102,11 +101,10 @@ const Header = () => {
                 <Link
                   key={link.href}
                   to={link.href}
-                  className={`py-3 px-4 rounded-lg transition-colors ${
-                    isActive(link.href)
+                  className={`py-3 px-4 rounded-lg transition-colors ${isActive(link.href)
                       ? "bg-accent/10 text-accent font-semibold"
                       : "text-foreground hover:bg-muted"
-                  }`}
+                    }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span>{link.label}</span>
