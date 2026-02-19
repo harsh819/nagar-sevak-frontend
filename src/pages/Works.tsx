@@ -3,6 +3,7 @@ import axios from "axios";
 import { HardHat, MapPin, Calendar, CheckCircle, Clock, Hammer, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTenant } from "@/lib/TenantContext";
 
 interface Work {
   _id: string;
@@ -15,6 +16,7 @@ interface Work {
   progress: number;
   status: string; // "Upcoming" | "In Progress" | "Completed"
   startDate: string;
+  image?: string;
 }
 
 const WorkCard = ({ work }: { work: Work }) => {
@@ -60,57 +62,68 @@ const WorkCard = ({ work }: { work: Work }) => {
   };
 
   return (
-    <div className="bg-card rounded-xl p-6 shadow-card hover:shadow-card-hover transition-all duration-300 border border-border/50">
-      <div className="flex items-start justify-between mb-4">
-        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-          <HardHat className="h-6 w-6 text-primary" />
-        </div>
-        {getStatusBadge()}
-      </div>
-
-      <h3 className="text-lg font-semibold text-foreground mb-2 line-clamp-1">{work.title}</h3>
-
-      <div className="flex items-center gap-1 text-muted-foreground text-sm mb-3">
-        <MapPin className="h-4 w-4 shrink-0" />
-        <span className="line-clamp-1">{work.location}</span>
-      </div>
-
-      <p className="text-sm text-muted-foreground mb-4 line-clamp-2 min-h-[40px]">{work.description}</p>
-
-      <div className="grid grid-cols-2 gap-4 text-sm mb-4">
-        <div>
-          <p className="text-muted-foreground">Budget</p>
-          <p className="font-semibold text-foreground">{formatBudget(work.budget)}</p>
-        </div>
-        <div>
-          <p className="text-muted-foreground">Start Date</p>
-          <p className="font-semibold text-foreground">{formatDate(work.startDate)}</p>
-        </div>
-      </div>
-
-      {work.status !== "Upcoming" && (
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Progress</span>
-            <span className="font-semibold text-foreground">{work.progress}%</span>
-          </div>
-          <div className="h-2 bg-muted rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all duration-500 ${work.progress === 100 ? "bg-green-500" : "bg-accent"
-                }`}
-              style={{ width: `${work.progress}%` }}
-            />
-          </div>
+    <div className="bg-card rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 border border-border/50">
+      {work.image && (
+        <div className="h-48 w-full overflow-hidden">
+          <img
+            src={work.image}
+            alt={work.title}
+            className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+          />
         </div>
       )}
-
-      {work.contractor && (
-        <div className="mt-4 pt-4 border-t border-border">
-          <p className="text-xs text-muted-foreground">
-            Contractor: <span className="text-foreground font-medium">{work.contractor}</span>
-          </p>
+      <div className="p-6">
+        <div className="flex items-start justify-between mb-4">
+          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+            <HardHat className="h-6 w-6 text-primary" />
+          </div>
+          {getStatusBadge()}
         </div>
-      )}
+
+        <h3 className="text-lg font-semibold text-foreground mb-2 line-clamp-1">{work.title}</h3>
+
+        <div className="flex items-center gap-1 text-muted-foreground text-sm mb-3">
+          <MapPin className="h-4 w-4 shrink-0" />
+          <span className="line-clamp-1">{work.location}</span>
+        </div>
+
+        <p className="text-sm text-muted-foreground mb-4 line-clamp-2 min-h-[40px]">{work.description}</p>
+
+        <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+          <div>
+            <p className="text-muted-foreground">Budget</p>
+            <p className="font-semibold text-foreground">{formatBudget(work.budget)}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">Start Date</p>
+            <p className="font-semibold text-foreground">{formatDate(work.startDate)}</p>
+          </div>
+        </div>
+
+        {work.status !== "Upcoming" && (
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Progress</span>
+              <span className="font-semibold text-foreground">{work.progress}%</span>
+            </div>
+            <div className="h-2 bg-muted rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${work.progress === 100 ? "bg-green-500" : "bg-accent"
+                  }`}
+                style={{ width: `${work.progress}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {work.contractor && (
+          <div className="mt-4 pt-4 border-t border-border">
+            <p className="text-xs text-muted-foreground">
+              Contractor: <span className="text-foreground font-medium">{work.contractor}</span>
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -119,11 +132,14 @@ const Works = () => {
   const [works, setWorks] = useState<Work[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { tenantId, office } = useTenant();
 
   const fetchWorks = async () => {
+    if (!tenantId) return;
+
     try {
       setLoading(true);
-      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/development/all-development`);
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/public/development/${tenantId}`);
       if (response.data.success) {
         setWorks(response.data.data);
       } else {
@@ -139,7 +155,7 @@ const Works = () => {
 
   useEffect(() => {
     fetchWorks();
-  }, []);
+  }, [tenantId]);
 
   const completedWorks = works.filter((w) => w.status === "Completed");
   const ongoingWorks = works.filter((w) => w.status === "In Progress");

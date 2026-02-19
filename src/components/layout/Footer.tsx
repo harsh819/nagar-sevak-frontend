@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import { Phone, Mail, MapPin, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
+import { useTenant } from "@/lib/TenantContext";
 
 const Footer = () => {
+  const { office } = useTenant();
   return (
     <footer className="bg-primary text-primary-foreground">
       {/* Main Footer */}
@@ -10,16 +12,16 @@ const Footer = () => {
           {/* About */}
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-accent-foreground font-bold">
-                NS
+              <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-accent-foreground overflow-hidden font-bold">
+                {office?.logo ? <img src={office.logo} className="w-full h-full object-contain p-1" /> : (office?.nagarSevakName?.substring(0, 1) || "N")}
               </div>
               <div>
-                <h3 className="font-bold text-lg">Nagar Sevak Office</h3>
-                <p className="text-xs text-primary-foreground/70">Ward No. 45</p>
+                <h3 className="font-bold text-lg">{office?.nagarSevakName || "Nagar Sevak Office"}</h3>
+                <p className="text-xs text-primary-foreground/70">{office?.wardName || "Janseva Office"}</p>
               </div>
             </div>
             <p className="text-primary-foreground/80 text-sm leading-relaxed mb-4">
-              जनसेवा प्रथम — डिजिटल सुविधा तुमच्या दारात। Dedicated to serving citizens 
+              जनसेवा प्रथम — डिजिटल सुविधा तुमच्या दारात। Dedicated to serving citizens
               with transparency and efficiency.
             </p>
             <div className="flex gap-3">
@@ -80,18 +82,18 @@ const Footer = () => {
               <li className="flex items-start gap-3 text-sm">
                 <MapPin className="h-5 w-5 text-accent shrink-0 mt-0.5" />
                 <span className="text-primary-foreground/80">
-                  Nagar Sevak Office, Ward 45,<br />
-                  Near Community Hall,<br />
-                  Mumbai - 400001
+                  {office?.wardName || "Nagar Sevak Office"},<br />
+                  Municipal Corporation,<br />
+                  Maharashtra, India
                 </span>
               </li>
               <li className="flex items-center gap-3 text-sm">
                 <Phone className="h-5 w-5 text-accent shrink-0" />
-                <span className="text-primary-foreground/80">+91 98765 43210</span>
+                <span className="text-primary-foreground/80">{office?.phoneNumber || "+91 98765 43210"}</span>
               </li>
               <li className="flex items-center gap-3 text-sm">
                 <Mail className="h-5 w-5 text-accent shrink-0" />
-                <span className="text-primary-foreground/80">nagarsevak@ward45.gov.in</span>
+                <span className="text-primary-foreground/80">{office?.email || "contact@office.gov.in"}</span>
               </li>
             </ul>
           </div>
@@ -102,7 +104,7 @@ const Footer = () => {
       <div className="border-t border-primary-foreground/10">
         <div className="container py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm text-primary-foreground/60">
-            © 2024 Nagar Sevak Office. All rights reserved.
+            © {new Date().getFullYear()} {office?.nagarSevakName || "Nagar Sevak Office"}. All rights reserved.
           </p>
           <div className="flex gap-4 text-sm text-primary-foreground/60">
             <Link to="/privacy" className="hover:text-accent transition-colors">Privacy Policy</Link>

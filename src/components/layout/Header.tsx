@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Phone, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTenant } from "@/lib/TenantContext";
 
 const Header = () => {
+  const { office } = useTenant();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -26,11 +28,11 @@ const Header = () => {
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1">
               <Phone className="h-3 w-3" />
-              +91 98765 43210
+              {office?.phoneNumber || "+91 98765 43210"}
             </span>
             <span className="hidden sm:flex items-center gap-1">
               <MapPin className="h-3 w-3" />
-              Ward No. 45, Mumbai
+              {office?.wardName || "Ward No. 00, City"}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -47,12 +49,20 @@ const Header = () => {
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full gradient-primary flex items-center justify-center text-primary-foreground font-bold text-lg lg:text-xl">
-                NS
+              <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full flex items-center justify-center overflow-hidden bg-slate-100 border border-slate-200 shadow-sm p-1.5 hover:scale-105 transition-transform">
+                {office?.logo ? (
+                  <img src={office.logo} alt="Logo" className="w-full h-full object-contain" />
+                ) : (
+                  <span className="text-primary font-black text-sm">{office?.nagarSevakName?.substring(0, 1).toUpperCase() || "N"}</span>
+                )}
               </div>
-              <div className="hidden sm:block">
-                <h1 className="text-lg lg:text-xl font-bold text-primary">Nagar Sevak</h1>
-                <p className="text-xs text-muted-foreground">जनसेवा प्रथम</p>
+              <div className="flex flex-col -space-y-1">
+                <h1 className="text-base lg:text-lg font-black text-primary tracking-tight">
+                  {office?.nagarSevakName || "Nagar Sevak"}
+                </h1>
+                <p className="text-[10px] lg:text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                  {office?.wardName || "Janseva Office"} {office?.wardName ? "Office" : ""}
+                </p>
               </div>
             </Link>
 
@@ -63,8 +73,8 @@ const Header = () => {
                   key={link.href}
                   to={link.href}
                   className={`transition-colors duration-200 font-medium ${isActive(link.href)
-                      ? "text-accent"
-                      : "text-foreground/80 hover:text-accent"
+                    ? "text-accent"
+                    : "text-foreground/80 hover:text-accent"
                     }`}
                 >
                   {link.label}
@@ -102,8 +112,8 @@ const Header = () => {
                   key={link.href}
                   to={link.href}
                   className={`py-3 px-4 rounded-lg transition-colors ${isActive(link.href)
-                      ? "bg-accent/10 text-accent font-semibold"
-                      : "text-foreground hover:bg-muted"
+                    ? "bg-accent/10 text-accent font-semibold"
+                    : "text-foreground hover:bg-muted"
                     }`}
                   onClick={() => setIsMenuOpen(false)}
                 >

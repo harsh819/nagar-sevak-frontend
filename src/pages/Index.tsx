@@ -2,8 +2,11 @@ import { Link } from "react-router-dom";
 import { ArrowRight, FileText, Search, Phone, CheckCircle, HardHat, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-leader.jpg";
+import { useTenant } from "@/lib/TenantContext";
 
 const HeroSection = () => {
+  const { office } = useTenant();
+
   return (
     <section className="relative overflow-hidden gradient-hero min-h-[600px] lg:min-h-[700px] flex items-center">
       {/* Background Pattern */}
@@ -18,18 +21,18 @@ const HeroSection = () => {
           <div className="text-primary-foreground animate-slide-up">
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
               <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-              <span className="text-sm font-medium">Ward No. 45 • Mumbai</span>
+              <span className="text-sm font-medium">{office?.wardName ? `${office.wardName} Office` : "Nagar Sevak Office"} • जनसेवा</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-4">
-              जनसेवा प्रथम
+              {office?.nagarSevakName || "Nagar Sevak Office"}
             </h1>
             <p className="text-xl sm:text-2xl lg:text-3xl font-medium text-primary-foreground/90 mb-6">
               डिजिटल सुविधा तुमच्या दारात
             </p>
             <p className="text-base lg:text-lg text-primary-foreground/80 mb-8 max-w-lg">
               Transforming public service through digital innovation. Register complaints,
-              track progress, and stay connected with your Nagar Sevak's development initiatives.
+              track progress, and stay connected with your local representative.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
@@ -51,12 +54,30 @@ const HeroSection = () => {
           {/* Hero Image */}
           <div className="hidden lg:flex justify-center lg:justify-end">
             <div className="relative">
-              <div className="w-80 h-80 xl:w-96 xl:h-96 rounded-full overflow-hidden border-4 border-white/30 shadow-2xl">
-                <img
-                  src={heroImage}
-                  alt="Nagar Sevak"
-                  className="w-full h-full object-cover object-top"
-                />
+              <div className="w-80 h-80 xl:w-96 xl:h-96 rounded-full overflow-hidden border-4 border-white/30 shadow-2xl bg-white/10 flex items-center justify-center">
+                {office?.profilePic || (office as any)?.profilePicture ? (
+                  <img
+                    src={office.profilePic || (office as any)?.profilePicture}
+                    alt={office.nagarSevakName}
+                    className="w-full h-full object-cover object-top"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = heroImage;
+                    }}
+                  />
+                ) : (
+                  <div className="relative w-full h-full flex items-center justify-center">
+                    <img
+                      src={heroImage}
+                      alt="Leader Fallback"
+                      className="w-full h-full object-cover opacity-60"
+                    />
+                    <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                      <span className="text-8xl font-black text-white opacity-40">
+                        {office?.nagarSevakName?.substring(0, 1) || "N"}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
               {/* Floating Badge */}
               <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-xl p-4 animate-float">
@@ -65,8 +86,8 @@ const HeroSection = () => {
                     <CheckCircle className="h-5 w-5 text-accent" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-foreground">2,500+</p>
-                    <p className="text-xs text-muted-foreground">Issues Resolved</p>
+                    <p className="text-sm font-semibold text-foreground">Active Portal</p>
+                    <p className="text-xs text-muted-foreground">{office?.wardName || "Verified Office"}</p>
                   </div>
                 </div>
               </div>

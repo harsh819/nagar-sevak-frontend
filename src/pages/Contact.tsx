@@ -5,8 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useTenant } from "@/lib/TenantContext";
 
 const Contact = () => {
+  const { office } = useTenant();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -30,20 +32,20 @@ const Contact = () => {
       icon: MapPin,
       title: "Office Address",
       lines: [
-        "Nagar Sevak Office, Ward 45",
-        "Near Community Hall",
-        "Mumbai - 400001, Maharashtra",
+        office?.wardName || "Legislative Office",
+        "Local Authority Office",
+        "Mumbai, Maharashtra",
       ],
     },
     {
       icon: Phone,
-      title: "Phone Numbers",
-      lines: ["+91 98765 43210", "+91 22 2345 6789"],
+      title: "Phone Number",
+      lines: [office?.phoneNumber || "+91 98765 43210"],
     },
     {
       icon: Mail,
       title: "Email",
-      lines: ["nagarsevak@ward45.gov.in", "support@ward45.gov.in"],
+      lines: [office?.email || "contact@office.com"],
     },
     {
       icon: Clock,

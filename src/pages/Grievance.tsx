@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 
+import { useTenant } from "@/lib/TenantContext";
+
 const categories = [
   { value: "WATER", label: "Water Supply", labelMr: "पाणी पुरवठा" },
   { value: "ROAD", label: "Road & Pothole", labelMr: "रस्ते आणि खड्डे" },
@@ -26,6 +28,7 @@ const boothNumbers = Array.from({ length: 12 }, (_, i) => ({
 const Grievance = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { office, loading: tenantLoading } = useTenant();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [complaintId, setComplaintId] = useState("");
@@ -112,6 +115,16 @@ const Grievance = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!office?._id) {
+      toast({
+        title: "Identity Error",
+        description: "Unable to identify the Nagar Sevak office. Please use a valid link.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -122,6 +135,7 @@ const Grievance = () => {
 
       // Create FormData for multipart/form-data
       const submitData = new FormData();
+      submitData.append("tenantId", office._id);
       submitData.append("fullName", formData.fullName);
       submitData.append("mobileNumber", formData.mobileNumber);
       submitData.append("address", formData.address);
