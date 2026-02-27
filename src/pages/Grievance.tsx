@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FileText, Upload, MapPin, CheckCircle, Copy } from "lucide-react";
+import { FileText, Upload, MapPin, CheckCircle, Copy, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import axios from "axios";
 
 import { useTenant } from "@/lib/TenantContext";
@@ -46,6 +48,12 @@ const Grievance = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [isCopied, setIsCopied] = useState(false);
+
+  // OTP Verification state
+  const [showOTPModal, setShowOTPModal] = useState(false);
+  const [otpValue, setOtpValue] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isOTPSending, setIsOTPSending] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -128,14 +136,110 @@ const Grievance = () => {
     setIsSubmitting(true);
 
     try {
-      const apiUrl = `${import.meta.env.VITE_BACKEND_URL}/api/complaints/register-complaint`;
+      // Step 1: Check if user is verified
+      const checkUrl = `${import.meta.env.VITE_BACKEND_URL}/api/auth/check-status`;
+      const statusRes = await axios.post(checkUrl, {
+        mobileNumber: formData.mobileNumber,
+        tenantId: office._id
+      });
 
-      console.log("=== FRONTEND SUBMISSION DEBUG ===");
-      console.log("Current location state:", location);
+      if (statusRes.data.success && statusRes.data.isVerified) {
+        // User already verified, auto-fill name if available and proceed
+        if (statusRes.data.fullName) {
+          setFormData(prev => ({ ...prev, fullName: statusRes.data.fullName }));
+        }
+        await performFinalSubmission();
+      } else {
+        // User NOT verified, send OTP and show modal
+        await sendVerificationOTP();
+      }
+    } catch (error: any) {
+      console.error("Error checking verification status:", error);
+      setIsSubmitting(false);
+      toast({
+        title: "Error",
+        description: "Failed to verify connection. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const sendVerificationOTP = async () => {
+    setIsOTPSending(true);
+    try {
+      const otpUrl = `${import.meta.env.VITE_BACKEND_URL}/api/auth/send-otp`;
+      await axios.post(otpUrl, {
+        mobileNumber: formData.mobileNumber,
+        tenantId: office?._id
+      });
+
+      setShowOTPModal(true);
+      toast({
+        title: "OTP Sent",
+        description: "A verification code has been sent to your mobile number.",
+      });
+    } catch (error: any) {
+      console.error("Error sending OTP:", error);
+      toast({
+        title: "OTP Failed",
+        description: "Unable to send verification code. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsOTPSending(false);
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    if (otpValue.length < 6) {
+      toast({
+        title: "Invalid OTP",
+        description: "Please enter a 6-digit verification code.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsVerifying(true);
+    try {
+      const verifyUrl = `${import.meta.env.VITE_BACKEND_URL}/api/auth/verify-otp`;
+      const res = await axios.post(verifyUrl, {
+        mobileNumber: formData.mobileNumber,
+        tenantId: office?._id,
+        otp: otpValue
+      });
+
+      if (res.data.success) {
+        setShowOTPModal(false);
+        toast({
+          title: "Verified Successfully!",
+          description: "Your mobile number has been verified.",
+        });
+
+        // Mobile verified, now submit the actual complaint
+        setIsSubmitting(true);
+        await performFinalSubmission();
+      }
+    } catch (error: any) {
+      console.error("Error verifying OTP:", error);
+      toast({
+        title: "Verification Failed",
+        description: "The code you entered is incorrect or expired.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const performFinalSubmission = async () => {
+    try {
+      const apiUrl = `${import.meta.env.VITE_BACKEND_URL}/api/complaints/register-complaint`;
 
       // Create FormData for multipart/form-data
       const submitData = new FormData();
-      submitData.append("tenantId", office._id);
+      if (office?._id) submitData.append("tenantId", office._id);
       submitData.append("fullName", formData.fullName);
       submitData.append("mobileNumber", formData.mobileNumber);
       submitData.append("address", formData.address);
@@ -143,29 +247,14 @@ const Grievance = () => {
       submitData.append("complaintCategory", formData.complaintCategory);
       submitData.append("complaintDescription", formData.complaintDescription);
 
-      // Add image if uploaded
-      if (imageFile) {
-        submitData.append("image", imageFile);
-        console.log("✅ Image added to FormData");
-      }
+      if (imageFile) submitData.append("image", imageFile);
 
-      // Add location if captured (in GeoJSON format)
       if (location) {
         const locationData = {
           type: "Point",
-          coordinates: [location.longitude, location.latitude], // [longitude, latitude] for GeoJSON
+          coordinates: [location.longitude, location.latitude],
         };
-        console.log("📍 Location data to send:", locationData);
         submitData.append("location", JSON.stringify(locationData));
-        console.log("✅ Location added to FormData");
-      } else {
-        console.log("⚠️ No location to send");
-      }
-
-      // Log all FormData entries
-      console.log("FormData entries:");
-      for (let [key, value] of submitData.entries()) {
-        console.log(`  ${key}:`, value);
       }
 
       const response = await axios.post(apiUrl, submitData, {
@@ -174,9 +263,6 @@ const Grievance = () => {
         },
       });
 
-      console.log("Backend response:", response.data);
-
-      // Extract complaint ID from response
       const generatedId = response.data.data?.complaintId || response.data.complaintId || `NS-${Date.now().toString().slice(-6)}`;
       setComplaintId(generatedId);
       setSubmitted(true);
@@ -186,7 +272,6 @@ const Grievance = () => {
         description: `Your complaint ID is ${generatedId}`,
       });
 
-      // Reset form
       setFormData({
         fullName: "",
         mobileNumber: "",
@@ -407,6 +492,61 @@ const Grievance = () => {
           </form>
         </div>
       </div>
+
+      {/* OTP Verification Modal */}
+      <Dialog open={showOTPModal} onOpenChange={setShowOTPModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
+              <ShieldCheck className="h-8 w-8 text-accent" />
+            </div>
+            <DialogTitle className="text-center text-xl">Verify Your Identity</DialogTitle>
+            <DialogDescription className="text-center">
+              तुमची ओळख सत्यापित करा। We've sent a 6-digit code to <span className="font-bold text-foreground">+91 {formData.mobileNumber}</span>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center py-6">
+            <InputOTP
+              maxLength={6}
+              value={otpValue}
+              onChange={(value) => setOtpValue(value)}
+            >
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+                <InputOTPSlot index={5} />
+              </InputOTPGroup>
+            </InputOTP>
+          </div>
+          <DialogFooter className="sm:justify-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowOTPModal(false)}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="accent"
+              onClick={handleVerifyOTP}
+              disabled={isVerifying || otpValue.length < 6}
+              className="flex-1"
+            >
+              {isVerifying ? (
+                <>
+                  <span className="animate-spin mr-2">⏳</span>
+                  Verifying...
+                </>
+              ) : (
+                "Verify & Submit"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

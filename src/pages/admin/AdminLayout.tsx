@@ -78,9 +78,8 @@ const AdminLayout = () => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-card border-r border-border z-50 transform transition-transform lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed top-0 left-0 h-full w-64 bg-card border-r border-border z-50 transform transition-transform lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         <div className="p-4 border-b border-border flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
@@ -106,11 +105,10 @@ const AdminLayout = () => {
               key={item.href}
               to={item.href}
               onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                isActive(item.href)
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive(item.href)
                   ? "bg-accent text-accent-foreground"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
+                }`}
             >
               <item.icon className="h-5 w-5" />
               <span className="font-medium">{item.label}</span>

@@ -132,33 +132,45 @@ const Works = () => {
   const [works, setWorks] = useState<Work[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { tenantId, office } = useTenant();
+  const { tenantId, office, loading: tenantLoading } = useTenant();
 
   const fetchWorks = async () => {
-    if (!tenantId) return;
+    // Determine the ID to use (prefer tenantId from context, fallback to office._id)
+    const idToUse = tenantId || office?._id;
+
+    if (!idToUse) {
+      if (!tenantLoading) {
+        setLoading(false);
+      }
+      return;
+    }
 
     try {
       setLoading(true);
-      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/public/development/${tenantId}`);
+      const baseUrl = import.meta.env.VITE_BACKEND_URL;
+      const response = await axios.get(`${baseUrl}/api/public/development/${idToUse}`);
+
       if (response.data.success) {
         setWorks(response.data.data);
       } else {
-        setError("Failed to fetch works");
+        setError("Failed to fetch works data");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching works:", err);
-      setError("Something went wrong while fetching data");
+      setError(err.response?.data?.message || "Something went wrong while fetching data");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchWorks();
-  }, [tenantId]);
+    if (!tenantLoading) {
+      fetchWorks();
+    }
+  }, [tenantId, office?._id, tenantLoading]);
 
   const completedWorks = works.filter((w) => w.status === "Completed");
-  const ongoingWorks = works.filter((w) => w.status === "In Progress");
+  const ongoingWorks = works.filter((w) => w.status === "In Progress" || w.status === "Ongoing");
   const upcomingWorks = works.filter((w) => w.status === "Upcoming");
 
   if (loading) {

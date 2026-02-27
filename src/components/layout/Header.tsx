@@ -11,7 +11,7 @@ const Header = () => {
 
   const navLinks = [
     { href: "/", label: "Home", labelMr: "मुख्यपृष्ठ" },
-    { href: "/about", label: "About", labelMr: "माहिती" },
+    // { href: "/about", label: "About", labelMr: "माहिती" },
     { href: "/grievance", label: "Grievance", labelMr: "तक्रार" },
     { href: "/track", label: "Track", labelMr: "स्थिती" },
     { href: "/works", label: "Works", labelMr: "कामे" },
