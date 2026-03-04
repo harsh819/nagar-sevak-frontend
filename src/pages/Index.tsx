@@ -18,24 +18,38 @@ const HeroSection = () => {
       <div className="container relative z-10">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Content */}
-          <div className="text-primary-foreground animate-slide-up">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
+          <div className="text-primary-foreground animate-slide-up order-2 lg:order-1 text-center lg:text-left flex flex-col items-center lg:items-start">
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-4">
               <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
               <span className="text-sm font-medium">{office?.wardName ? `${office.wardName} Office` : "Nagar Sevak Office"} • जनसेवा</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-4">
+            {/* Mobile Profile Photo */}
+            <div className="lg:hidden mb-6">
+              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white/30 shadow-xl bg-white/10 mx-auto">
+                <img
+                  src={office?.profilePic || (office as any)?.profilePicture || heroImage}
+                  alt={office?.nagarSevakName}
+                  className="w-full h-full object-cover object-top"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = heroImage;
+                  }}
+                />
+              </div>
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-2">
               {office?.nagarSevakName || "Nagar Sevak Office"}
             </h1>
-            <p className="text-xl sm:text-2xl lg:text-3xl font-medium text-primary-foreground/90 mb-6">
+            <p className="text-lg sm:text-xl lg:text-3xl font-medium text-primary-foreground/90 mb-4">
               डिजिटल सुविधा तुमच्या दारात
             </p>
-            <p className="text-base lg:text-lg text-primary-foreground/80 mb-8 max-w-lg">
+            <p className="text-sm lg:text-lg text-primary-foreground/80 mb-6 max-w-lg">
               Transforming public service through digital innovation. Register complaints,
-              track progress, and stay connected with your local representative.
+              track progress, and stay connected.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               <Button variant="hero" size="lg" asChild>
                 <Link to="/grievance">
                   <FileText className="h-5 w-5" />
@@ -51,8 +65,8 @@ const HeroSection = () => {
             </div>
           </div>
 
-          {/* Hero Image */}
-          <div className="hidden lg:flex justify-center lg:justify-end">
+          {/* Hero Image (Desktop Only) */}
+          <div className="hidden lg:flex justify-center lg:justify-end animate-fade-in order-1 lg:order-2">
             <div className="relative">
               <div className="w-80 h-80 xl:w-96 xl:h-96 rounded-full overflow-hidden border-4 border-white/30 shadow-2xl bg-white/10 flex items-center justify-center">
                 {office?.profilePic || (office as any)?.profilePicture ? (
