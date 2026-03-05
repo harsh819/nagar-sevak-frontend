@@ -257,11 +257,7 @@ const Grievance = () => {
         submitData.append("location", JSON.stringify(locationData));
       }
 
-      const response = await axios.post(apiUrl, submitData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(apiUrl, submitData);
 
       const generatedId = response.data.data?.complaintId || response.data.complaintId || `NS-${Date.now().toString().slice(-6)}`;
       setComplaintId(generatedId);
