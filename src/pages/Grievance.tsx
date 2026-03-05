@@ -55,6 +55,10 @@ const Grievance = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [isOTPSending, setIsOTPSending] = useState(false);
 
+  const getCleanMobileNumber = (number: string) => {
+    return number.replace(/\D/g, '').slice(-10);
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({ ...prev, [id]: value }));
@@ -136,10 +140,12 @@ const Grievance = () => {
     setIsSubmitting(true);
 
     try {
+      const cleanMobile = getCleanMobileNumber(formData.mobileNumber);
+
       // Step 1: Check if user is verified
       const checkUrl = `${import.meta.env.VITE_BACKEND_URL}/api/auth/check-status`;
       const statusRes = await axios.post(checkUrl, {
-        mobileNumber: formData.mobileNumber,
+        mobileNumber: cleanMobile,
         tenantId: office._id
       });
 
@@ -167,9 +173,10 @@ const Grievance = () => {
   const sendVerificationOTP = async () => {
     setIsOTPSending(true);
     try {
+      const cleanMobile = getCleanMobileNumber(formData.mobileNumber);
       const otpUrl = `${import.meta.env.VITE_BACKEND_URL}/api/auth/send-otp`;
       await axios.post(otpUrl, {
-        mobileNumber: formData.mobileNumber,
+        mobileNumber: cleanMobile,
         tenantId: office?._id
       });
 
@@ -203,9 +210,10 @@ const Grievance = () => {
 
     setIsVerifying(true);
     try {
+      const cleanMobile = getCleanMobileNumber(formData.mobileNumber);
       const verifyUrl = `${import.meta.env.VITE_BACKEND_URL}/api/auth/verify-otp`;
       const res = await axios.post(verifyUrl, {
-        mobileNumber: formData.mobileNumber,
+        mobileNumber: cleanMobile,
         tenantId: office?._id,
         otp: otpValue
       });
@@ -239,9 +247,10 @@ const Grievance = () => {
 
       // Create FormData for multipart/form-data
       const submitData = new FormData();
+      const cleanMobile = getCleanMobileNumber(formData.mobileNumber);
       if (office?._id) submitData.append("tenantId", office._id);
       submitData.append("fullName", formData.fullName);
-      submitData.append("mobileNumber", formData.mobileNumber);
+      submitData.append("mobileNumber", cleanMobile);
       submitData.append("address", formData.address);
       submitData.append("boothNumber", formData.boothNumber);
       submitData.append("complaintCategory", formData.complaintCategory);
@@ -498,7 +507,7 @@ const Grievance = () => {
             </div>
             <DialogTitle className="text-center text-xl">Verify Your Identity</DialogTitle>
             <DialogDescription className="text-center">
-              तुमची ओळख सत्यापित करा। We've sent a 6-digit code to <span className="font-bold text-foreground">+91 {formData.mobileNumber}</span>
+              तुमची ओळख सत्यापित करा। We've sent a 6-digit code to <span className="font-bold text-foreground">+91 {getCleanMobileNumber(formData.mobileNumber)}</span>
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center justify-center py-6">
