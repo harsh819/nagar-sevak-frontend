@@ -49,7 +49,7 @@ const Header = () => {
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full flex items-center justify-center overflow-hidden bg-slate-100 border border-slate-200 shadow-sm p-1.5 hover:scale-105 transition-transform">
+              <div className="w-10 h-10 lg:w-14 lg:h-14 flex items-center justify-center overflow-hidden shadow-sm p-1.5 hover:scale-105 transition-transform">
                 {office?.logo ? (
                   <img src={office.logo} alt="Logo" className="w-full h-full object-contain" />
                 ) : (

@@ -12,7 +12,7 @@ const Footer = () => {
           {/* About */}
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-accent-foreground overflow-hidden font-bold">
+              <div className="w-12 h-12 flex items-center justify-center overflow-hidden font-bold">
                 {office?.logo ? <img src={office.logo} className="w-full h-full object-contain p-1" /> : (office?.nagarSevakName?.substring(0, 1) || "N")}
               </div>
               <div>
