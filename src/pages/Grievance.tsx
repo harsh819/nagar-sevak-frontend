@@ -90,11 +90,12 @@ const Grievance = () => {
         (error) => {
           toast({
             title: "Location Error",
-            description: "Unable to get your location. Please try again.",
+            description: "Unable to get your location. Please check your iPhone GPS settings.",
             variant: "destructive",
           });
           console.error("Location error:", error);
-        }
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     } else {
       toast({
@@ -227,7 +228,10 @@ const Grievance = () => {
 
         // Mobile verified, now submit the actual complaint
         setIsSubmitting(true);
-        await performFinalSubmission();
+        // Small delay to allow modal to close fully (Safari compatibility)
+        setTimeout(async () => {
+          await performFinalSubmission();
+        }, 500);
       }
     } catch (error: any) {
       console.error("Error verifying OTP:", error);
