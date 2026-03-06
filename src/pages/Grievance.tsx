@@ -195,7 +195,7 @@ const Grievance = () => {
       });
     } finally {
       setIsOTPSending(false);
-      setIsSubmitting(false);
+      // Keep isSubmitting true if we showed the modal
     }
   };
 
@@ -246,6 +246,11 @@ const Grievance = () => {
   };
 
   const performFinalSubmission = async () => {
+    toast({
+      title: "Finishing Submision...",
+      description: "Uploading details and photo. This may take a moment.",
+    });
+
     try {
       const apiUrl = `${import.meta.env.VITE_BACKEND_URL}/api/complaints/register-complaint`;
 
